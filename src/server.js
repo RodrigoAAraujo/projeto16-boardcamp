@@ -13,8 +13,8 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-//app.use(gamesRoutes)
-//app.use(rentRoutes)
+app.use(gamesRoutes)
+app.use(rentRoutes)
 app.use(categoriesRoutes)
 app.use(clientsRoutes)
 

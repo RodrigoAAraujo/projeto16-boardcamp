@@ -39,6 +39,8 @@ export async function sendSpecificCustomer(req, res){
 export async function registerCustomer(req,res){
     const {name, phone, cpf, birthday} = req.body
 
+    console.log(req.body)
+
     try{
         await connection.query("INSERT INTO customers (name,phone,cpf,birthday) VALUES ($1, $2, $3, $4)",
         [name, phone, cpf, birthday])
