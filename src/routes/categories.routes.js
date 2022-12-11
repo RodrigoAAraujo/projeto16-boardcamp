@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { sendCategories, registerCategory } from "../controllers/categories.controllers.js";
+import {validateCategory} from "../middlewares/categories.middlewares.js";
 
 const router = Router()
 
