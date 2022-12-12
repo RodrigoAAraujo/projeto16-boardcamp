@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import connection from "../database/database.js";
 
 export async function sendRentals(req, res) {
-    const { gameId, customerId } = req.query
+    const { gameId, customerId , status, startDate} = req.query
 
     try {
         const games = await connection.query("SELECT * FROM games")
@@ -10,12 +10,21 @@ export async function sendRentals(req, res) {
         const categories = await connection.query("SELECT * FROM categories")
         let rents =null
 
-        if (!gameId && !customerId) {
+        if (!gameId && !customerId && (status !== "open" && status !== "closed") && !startDate) {
             rents = await connection.query(`SELECT *  FROM rentals`)
         }else if (gameId) {
             rents = await connection.query(`SELECT *  FROM rentals WHERE "gameId"=$1`, [gameId])
         }else if (customerId){
-            rents = await connection.query(`SELECT *  FROM rentals WHERE "customerId"=$1`, [customer])
+            rents = await connection.query(`SELECT *  FROM rentals WHERE "customerId"=$1`, [customerId])
+        }else if (status){
+            if(status === "open"){
+                rents = await connection.query(`SELECT *  FROM rentals WHERE "returnDate" IS NULL`)
+            }else if(status === "closed"){
+                rents = await connection.query(`SELECT *  FROM rentals WHERE "returnDate" IS NOT NULL`)
+            }
+        }else if (startDate){
+            rents = await connection.query(`SELECT *  FROM rentals WHERE "rentDate" >= $1`,[startDate])
+
         }
 
         const rentalInfo = rents.rows.map((rent) => ({
@@ -37,7 +46,6 @@ export async function sendRentals(req, res) {
         res.send(rentalInfo)
         return
         
-
     } catch (err) {
         res.status(500).send({ message: err })
         return

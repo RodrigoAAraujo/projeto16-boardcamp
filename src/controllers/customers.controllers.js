@@ -9,7 +9,10 @@ export async function sendCustomers(req, res){
             res.send(filteredCustomers.rows)
             return
         }else{
-            const customers = await connection.query("SELECT * FROM customers")
+            const customers = await connection.query(`
+                SELECT * FROM customers JOIN 
+                rentals ON customers.id = rentals."customerId" GROUP BY customers.name
+            `)
             res.send(customers.rows)
             return
         }
