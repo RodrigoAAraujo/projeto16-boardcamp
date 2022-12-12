@@ -5,13 +5,18 @@ export async function sendCustomers(req, res){
 
     try{
         if(cpf){
-            const filteredCustomers = await connection.query("SELECT * FROM customers WHERE cpf LIKE $1",[`%${cpf}%`])
+            const filteredCustomers = await connection.query(`
+                SELECT customers.*, COUNT(rentals."customerId") AS "rentalsCount" FROM customers 
+                JOIN rentals ON customers.id = rentals."customerId" 
+                WHERE cpf LIKE $1 GROUP BY customers.id`
+            ,[`%${cpf}%`])
             res.send(filteredCustomers.rows)
             return
         }else{
             const customers = await connection.query(`
-                SELECT * FROM customers JOIN 
-                rentals ON customers.id = rentals."customerId" GROUP BY customers.name
+                SELECT customers.*, COUNT(rentals."customerId") AS "rentalsCount" FROM customers 
+                JOIN rentals ON customers.id = rentals."customerId"
+                GROUP BY customers.id
             `)
             res.send(customers.rows)
             return
